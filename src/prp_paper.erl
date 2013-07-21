@@ -8,6 +8,7 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 
+-type(wm_reqdata() :: #wm_reqdata{}).
 
 init(Config) ->
 	prp_schema:init_tables(),
@@ -53,7 +54,7 @@ from_json(RD, Ctx) ->
 		(wm_reqdata(), any(), string())
 			-> {boolean(), wm_reqdata(), any()}.
 from_json(RD, Ctx, {error, no_data}) ->
-	signal_malformed(RD, Ctx).
+	signal_malformed_request(RD, Ctx);
 
 from_json(RD, Ctx, Title) ->
 	Id = id_from_path(RD),
@@ -118,13 +119,12 @@ set_location_header_if_not_exists(RD, Ctx, Id) ->
 		{true, _, _}  -> RD
 	end.
 
--spec signal_malformed_request(wm_reqdata(), any())-> {{halt, 400}, wm_reqdata(), any()}
+-spec signal_malformed_request(wm_reqdata(), any())-> {{halt, 400}, wm_reqdata(), any()}.
 signal_malformed_request(RD, Ctx) ->
-	{{halt, 400}, RD, Ctx};
+	{{halt, 400}, RD, Ctx}.
 
 
--spec paper2json(integer(), string()) -> string();
-				(string(), string()) -> string().
+-spec paper2json(integer(), string()) -> string().
 paper2json(Id, Title) when is_integer(Id) ->
 	paper2json(integer_to_list(Id), Title);
 paper2json(Id, Title) ->
